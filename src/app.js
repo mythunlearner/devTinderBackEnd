@@ -14,7 +14,7 @@ app.post("/saveUser", async(req,res)=> {
    await userdata.save();
    res.send("User data Saved Successfully!!");
   } catch(error){
-    res.status(400).send("Error occcured on SaveUser !!!");
+    res.status(400).send("Error occcured on SaveUser !!!" + error);
   }
   
 });
