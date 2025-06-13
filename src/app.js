@@ -19,16 +19,77 @@ app.post("/saveUser", async(req,res)=> {
   
 });
 
+
+//Get al users 
+
+app.get("/feed", async(req,res)=>{
+   try{
+    const userDetails =  await user.find({});
+     res.send(userDetails);
+     console.log("Users retrived successfully");
+   }catch(error) {
+     res.status(404).send("Error occured on user retrival");
+   }
+});
+
+
+// Get single user by emailid
+app.get("/find", async(req,res)=>{
+  try{
+    const resEmailId = req.body.emailId;
+    console.log("EmailID"+ resEmailId);
+     const userDet = await user.findOne({emailId: resEmailId});
+     console.log(userDet);
+     res.send(userDet);
+  }catch{
+  res.status(404).send("Error occured on user retrival");
+  }
+});
+
+app.delete("/user", async(req,res)=>{
+ const userId = req.body.emailId;
+  console.log("Deleted User UserId" + userId);
+ try{
+   const deletedUser = await user.deleteOne({emailId: userId});
+   console.log("Deleted User" + deletedUser);
+   res.send("User Deleted Successfully");
+ }catch(err){
+  res.status(404).send("Error occured on user deletion" + err);
+ }
+});
+
+
+app.patch("/updateUser", async(req,res) => {
+  const userDetails = req.body;
+  const userId = req.body.userId;
+  try{
+    const updateUser = await user.findByIdAndUpdate({_id: userId}, userDetails);
+    console.log("User updated Successfully !!!"+ updateUser);
+    res.send("User updated Successfully");
+  }catch(err){
+    res.status(404).send("Error occured on user updation" + err);
+  }
+});
+
+app.patch("/updateUserEmail", async(req,res) => {
+  const userDetails = req.body;
+  const emailId = req.body.emailId;
+  try{
+    const updateUser = await user.findOneAndUpdate({emailId: emailId}, userDetails);
+    console.log("User EMAIL updated Successfully !!!"+ updateUser);
+    res.send("User EMAIL updated Successfully");
+  }catch(err){
+    res.status(404).send("Error occured on user updation" + err);
+  }
+});
 connectDB().then(() => {
    console.log("DB is Connected successfully !!");
   app.listen(3000, () => {
     console.log("Server is successfully listening in port 3000!");
   });
 }).catch( err=>{
-   console.log("Database cannot be connected !!");
+   console.log("Database cannot be connected !!" + err);
 });
-
-
 
 
 app.use("/admin", adminauth);
