@@ -66,7 +66,7 @@ app.patch("/updateUser/:userId", async(req,res) => {
     const UPDATE_FIELDS= ["firstName","lastName","age","gender","skills"];
     const isUpdatevalid = Object.keys(userDetails).every((key) => UPDATE_FIELDS.includes(key));
     if(!isUpdatevalid){
-      throw new Error("Invalid update fields provided");
+      throw new Error("Invalid update fields provided test");
     }
 
     if(userDetails?.skills.length>5){
