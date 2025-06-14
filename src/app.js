@@ -59,10 +59,19 @@ app.delete("/user", async(req,res)=>{
 });
 
 
-app.patch("/updateUser", async(req,res) => {
+app.patch("/updateUser/:userId", async(req,res) => {
   const userDetails = req.body;
-  const userId = req.body.userId;
+  const userId = req.params?.userId;
   try{
+    const UPDATE_FIELDS= ["firstName","lastName","age","gender","skills"];
+    const isUpdatevalid = Object.keys(userDetails).every((key) => UPDATE_FIELDS.includes(key));
+    if(!isUpdatevalid){
+      throw new Error("Invalid update fields provided");
+    }
+
+    if(userDetails?.skills.length>5){
+      throw new Error("Skills cannot be more than 5");
+    }
     const updateUser = await user.findByIdAndUpdate({_id: userId}, userDetails);
     console.log("User updated Successfully !!!"+ updateUser);
     res.send("User updated Successfully");
