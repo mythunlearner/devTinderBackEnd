@@ -2,9 +2,33 @@ const {adminauth, userauth} = require("./middlewares/auth");
 const express = require("express");
 const connectDB = require("./config/database");
 const user = require("./models/user");
+const {validateUserDetails} = require("./utils/validation");
+const bcrypt = require("bcrypt")
 const app = express();
 
 app.use(express.json());
+
+
+
+app.post("/signUp", async(req,res)=> {
+  console.log("SignUp User !!");
+  //Vlidation
+  validateUserDetails(req);
+  //encryption
+  const passwordenc =  bcrypt.hashSync(req.body.password, 10);
+
+  //create new user Object
+  try{
+   const {firstName, lastName, emailId, password = passwordenc, age,gender} = req.body;
+   const userdata = new user({firstName, lastName, emailId, password: passwordenc, age,gender});
+   await userdata.save();
+   res.send("User data Saved Successfully!!");
+  } catch(error){
+    res.status(400).send("Error occcured on SaveUser !!!" + error);
+  }
+  
+});
+
 
 app.post("/saveUser", async(req,res)=> {
   console.log("Saveuser !!");
