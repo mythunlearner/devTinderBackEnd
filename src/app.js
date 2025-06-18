@@ -30,6 +30,25 @@ app.post("/signUp", async(req,res)=> {
 });
 
 
+app.post("/login", async(req,res)=>{
+  console.log("User Login");
+  try{
+    const{emailId,password} = req.body;
+    const userDetails = await user.findOne({emailId: emailId});
+    if(!userDetails){
+      throw new Error("Invalid Credentials!!");
+    }
+    const isPasswordValid = await bcrypt.compare(password,userDetails.password);
+    if(!isPasswordValid){
+      throw new Error("Invalid Credentials!!");
+    }
+     res.send("User Logged in Successfully!!")
+  }catch(err){
+    res.status(400).send("Error occured on Login !!");
+  }
+
+});
+
 app.post("/saveUser", async(req,res)=> {
   console.log("Saveuser !!");
    const userdata = new user(req.body);
