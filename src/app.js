@@ -1,4 +1,4 @@
-const {adminauth, userauth} = require("./middlewares/auth");
+const {userauth} = require("./middlewares/auth");
 const express = require("express");
 const connectDB = require("./config/database");
 const user = require("./models/user");
@@ -7,7 +7,6 @@ const cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const app = express();
-
 app.use(express.json());
 app.use(cookieParser());
 
@@ -46,33 +45,26 @@ app.post("/login", async(req,res)=>{
       throw new Error("Invalid Credentials!!");
     }
     //Generate Jwt token
-     const token = await jwt.sign({_id: userDetails._id},"Milan@2020");
-      console.log("token" + token);
-     res.cookie("token",token);
+     const token = await jwt.sign({_id: userDetails._id},"Milan@2020", {expiresIn:"1h"});
+ 
+     //Assign token to a cookie
+     res.cookie("token",token, {expires: new Date(Date.now() + 1*3600000)});
      res.send("User Logged in Successfully!!")
   }catch(err){
-    res.status(400).send("Error occured on Login !!");
+    res.status(400).send("Error occured on Login !!"+ err) ;
   }
 
 });
 
-app.get("/profile", async(req,res)=>{
+app.get("/profile",userauth, async(req,res)=>{
   try{
-  const cookie = req.cookies;
-  console.log(cookie);
-
-  const {token} = cookie;
-  if(!token){
-     throw new Error("Invalid Token!!");
-  }
-  const decodemessage = await jwt.verify(token,"Milan@2020");
-  const {_id} = decodemessage;
-  const userDetail = await user.findOne({_id:_id});
-  if(!userDetail){
+ //User profile
+  const user = req.user;
+  
+  if(!user){
     throw new Error("User Does not exist");
   }
-  console.log(userDetail);
-  res.send("Reading Cookie!!!");
+  res.send(user);
   }catch(err){
     res.status(400).send("Error"+ err);
   }
@@ -80,7 +72,6 @@ app.get("/profile", async(req,res)=>{
 });
 
 app.post("/saveUser", async(req,res)=> {
-  console.log("Saveuser !!");
    const userdata = new user(req.body);
 
   try{
@@ -174,5 +165,5 @@ connectDB().then(() => {
 });
 
 
-app.use("/admin", adminauth);
+
 
