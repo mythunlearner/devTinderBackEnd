@@ -1,75 +1,17 @@
-const {userauth} = require("./middlewares/auth");
+
 const express = require("express");
 const connectDB = require("./config/database");
 const user = require("./models/user");
-const {validateUserDetails} = require("./utils/validation");
 const cookieParser = require("cookie-parser");
-const bcrypt = require("bcrypt")
-const jwt = require("jsonwebtoken");
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+app.use("/", authRouter);
+app.use("/", profileRouter);
 
-
-app.post("/signUp", async(req,res)=> {
-  console.log("SignUp User !!");
-  //Vlidation
-  validateUserDetails(req);
-  //encryption
-  const passwordenc =  bcrypt.hashSync(req.body.password, 10);
-
-  //create new user Object
-  try{
-   const {firstName, lastName, emailId, password = passwordenc, age,gender} = req.body;
-   const userdata = new user({firstName, lastName, emailId, password: passwordenc, age,gender});
-   await userdata.save();
-   res.send("User data Saved Successfully!!");
-  } catch(error){
-    res.status(400).send("Error occcured on SaveUser !!!" + error);
-  }
-  
-});
-
-
-app.post("/login", async(req,res)=>{
-  console.log("User Login");
-  try{
-    const{emailId,password} = req.body;
-    const userDetails = await user.findOne({emailId: emailId});
-    if(!userDetails){
-      throw new Error("Invalid Credentials!!");
-    }
-    const isPasswordValid = await  userDetails.validatePassword(password);
-    if(!isPasswordValid){
-      throw new Error("Invalid Credentials!!");
-    }
-    //Generate Jwt token
-     const token = await userDetails.getJWT();
- 
-     //Assign token to a cookie
-     res.cookie("token",token, {expires: new Date(Date.now() + 1*3600000)});
-     res.send("User Logged in Successfully!!")
-  }catch(err){
-    res.status(400).send("Error occured on Login !!"+ err) ;
-  }
-
-});
-
-app.get("/profile",userauth, async(req,res)=>{
-  try{
- //User profile
-  const user = req.user;
-  
-  if(!user){
-    throw new Error("User Does not exist");
-  }
-  res.send(user);
-  }catch(err){
-    res.status(400).send("Error"+ err);
-  }
-
-});
 
 app.post("/saveUser", async(req,res)=> {
    const userdata = new user(req.body);
