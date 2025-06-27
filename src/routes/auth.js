@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const user = require("../models/user");
 const authRouter = express.Router();
+const userauth = require("../middlewares/auth");
 
 
 authRouter.post("/signUp", async(req,res)=> {
@@ -47,6 +48,12 @@ authRouter.post("/login", async(req,res)=>{
   }catch(err){
     res.status(400).send("Error occured on Login !!"+ err) ;
   }
+
+
+  authRouter.post("/logout", userauth, async(req,res) => {
+    res.cookie("token",null, {expires: new Date(Date.now())});
+    res.send("User Logged off Successfully!!!");
+  })
 
 });
 

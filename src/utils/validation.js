@@ -13,4 +13,9 @@ const validateUserDetails =  (req) =>{
     }
 };
 
-module.exports = {validateUserDetails};
+const validateUserProfileDetailEdit =(req) => {
+  const userFields = ["firstName","lastName","emailId","age","gender","photoUrl","about", "skills"];
+  const isValidUserProfile =  Object.keys(req.body).every((key)=>userFields.includes(key));
+ return isValidUserProfile;
+};
+module.exports = {validateUserDetails, validateUserProfileDetailEdit};
