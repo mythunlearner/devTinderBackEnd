@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const user = require("../models/user");
 const authRouter = express.Router();
-const userauth = require("../middlewares/auth");
+const {userauth} = require("../middlewares/auth");
 
 
 authRouter.post("/signUp", async(req,res)=> {
@@ -49,13 +49,55 @@ authRouter.post("/login", async(req,res)=>{
     res.status(400).send("Error occured on Login !!"+ err) ;
   }
 
-
-  authRouter.post("/logout", userauth, async(req,res) => {
-    res.cookie("token",null, {expires: new Date(Date.now())});
-    res.send("User Logged off Successfully!!!");
-  })
-
 });
 
+
+authRouter.post("/logout", userauth, async(req,res) => {
+    res.cookie("token",null, {expires: new Date(Date.now())});
+    res.send("User Logged off Successfully!!!");
+  });
+
+authRouter.post("/forgotPassword",async(req,res) => {
+ try{
+  console.log(req.body);
+   const {emailId}= req.body;
+    console.log("emailID: "+ emailId);
+   const userDetail = await user.findOne({emailId: emailId});
+   console.log("[["+userDetail);
+   if(!userDetail){
+    res.status(400).send("Given Email is not registered!!")
+   }
+   const resetCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+   const expiry = Date.now() + 10 * 60 * 1000;
+
+   userDetail.resetCode = resetCode;
+   userDetail.resetCodeExpiry = expiry;
+   await userDetail.save(userDetail);
+
+   res.send("Reset passcode: " + userDetail.resetCode);
+ }catch(err){
+  res.status(400).send("Error occured on forgotPassword !!"+ err) ;
+ }
+});
+
+
+authRouter.post("/resetPassword", async(req,res) => {
+ try{
+  const {resetCode,emailId, password} = req.body;
+  const userDetail = await user.findOne({resetCode: resetCode,emailId: emailId});
+  if(!userDetail){
+    res.status(400).send("Token is Not valid!!")
+  }
+     //encrypted password
+    const passwordenc =  bcrypt.hashSync(password, 10);
+
+   userDetail.password = passwordenc;
+  await userDetail.save(userDetail);
+  res.send("Password Reset Success");
+   
+ }catch(error){
+   res.status(400).send("Error in password Reset" +error);
+ }  
+});
 
 module.exports = authRouter;

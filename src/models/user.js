@@ -62,6 +62,12 @@ const userSchema = new mongoose.Schema({
     },
     skills: {
         type: [String]
+    },
+    resetCode: {
+        type: String
+    },
+    resetCodeExpiry: {
+       type: Date
     }
 },
 {timestamps : true});
