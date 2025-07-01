@@ -57,7 +57,7 @@ authRouter.post("/logout", userauth, async(req,res) => {
     res.send("User Logged off Successfully!!!");
   });
 
-authRouter.post("/forgotPassword",async(req,res) => {
+authRouter.patch("/forgotPassword",async(req,res) => {
  try{
   console.log(req.body);
    const {emailId}= req.body;
@@ -81,7 +81,7 @@ authRouter.post("/forgotPassword",async(req,res) => {
 });
 
 
-authRouter.post("/resetPassword", async(req,res) => {
+authRouter.patch("/resetPassword", async(req,res) => {
  try{
   const {resetCode,emailId, password} = req.body;
   const userDetail = await user.findOne({resetCode: resetCode,emailId: emailId});
