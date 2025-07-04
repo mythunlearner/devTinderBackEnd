@@ -17,7 +17,8 @@ const connectionRequestSchema = new mongoose.Schema({
 
 },
 {timestamps:true});
-
+//CompundIndex to retrive the data quick (i,e adding index )
+connectionRequestSchema.index({fromUserId: 1,toUserId: 1});
 connectionRequestSchema.pre("save", function(next){
  const conncectionReq = this;
  //check if the fromUserID is same as toUserID
