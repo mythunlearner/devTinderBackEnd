@@ -3,5 +3,6 @@
     "github.copilot.chat.copilotDebugCommand.enabled": false,
     "github.copilot.chat.startDebugging.enabled": false,
     "github.copilot.chat.edits.newNotebook.enabled": false,
-    "github.copilot.nextEditSuggestions.enabled": false
+    "github.copilot.nextEditSuggestions.enabled": false,
+    "github.copilot.enable": false
 }

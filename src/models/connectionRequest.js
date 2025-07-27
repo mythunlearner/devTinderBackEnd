@@ -2,7 +2,9 @@ const mongoose = require("mongoose");
 
 const connectionRequestSchema = new mongoose.Schema({
     fromUserId: {
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",//Reference to User model
+        required: true
     },
     toUserId: {
         type: mongoose.Schema.Types.ObjectId
@@ -13,6 +15,12 @@ const connectionRequestSchema = new mongoose.Schema({
             values: ["ignored","interested","accepted","rejected"],
             message: `{VALUE} is incorrect status type`
         }
+    },
+    fromUserName:{
+        type: String
+    },
+    toUserName: {
+        type: String
     }
 
 },
