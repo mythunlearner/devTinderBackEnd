@@ -4,6 +4,9 @@
  
   try{
     const {token} = req.cookies;
+    if(!token){
+      return res.status(401).send("Please Login!");
+    }
     const decodeobj = await jwt.verify(token, "Milan@2020");
     const {_id} = decodeobj;
     const userDetails = await user.findById(_id);
