@@ -3,7 +3,7 @@ const connectionRequest = require('../models/connectionRequest');
 const user = require('../models/user');
 const {userauth} = require("../middlewares/auth");
 const userRouter = express.Router()
-const USER_SAFE_DATA = "firstName lastName photoUrl age"
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about"
 /*
 This method will show the connections received from a multiple peoples to user
 */
@@ -13,7 +13,7 @@ userRouter.get('/user/requests/received', userauth,async (req, res) => {
         console.log("Logged in user ID: " + loggedInUserId);
         const connRequest = await connectionRequest.find({toUserId: loggedInUserId, status: "interested"
             
-        }).populate('fromUserId', 'firstName lastName email');
+        }).populate('fromUserId', USER_SAFE_DATA);
         if(!connectionRequest || connectionRequest.length === 0){
             return res.status(404).json({message: "No connection requests found"});
         }
@@ -34,7 +34,7 @@ userRouter.get('/user/connections', userauth, async (req, res) => {
                 {toUserId: loggedInUser._id, status: "accepted"},
                 {fromUserId: loggedInUser._id, status: "accepted"}
             ]
-        }).populate("fromUserId","firstName lastName photoUrl age");
+        }).populate("fromUserId","firstName lastName photoUrl age gender about");
 
         const userData = connRequest.map((row) =>{
            if(row.fromUserId.toString() == loggedInUser._id.toString()){
@@ -60,14 +60,14 @@ userRouter.get('/feed',userauth, async(req,res) =>{
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page-1)*limit;
         const loggedInuser = req.user;
-        console.log("loggedInuser._id" + loggedInuser._id);
+        // console.log("loggedInuser._id" + loggedInuser._id);
         // get details of users who send and receive connection. 
         const connectionUser = await connectionRequest.find({
             $or:[{fromUserId: loggedInuser._id},
                 {toUserId: loggedInuser._id}
             ]
         }).select("fromUserId toUserId");
-        console.log("connectionUser" + connectionUser);
+        // console.log("connectionUser" + connectionUser);
          //Removing Duplicate record 
         const hideUserFromFeed = new Set();
         connectionUser.forEach((req) =>{

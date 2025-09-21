@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
         type: String,
          validate:{
             validator: function (value) {
-                return ['Male', 'Female', 'Other'].includes(value);
+                return ['Male', 'Female', 'Other' ,'Prefer not to say'].includes(value);
             }
 
          }

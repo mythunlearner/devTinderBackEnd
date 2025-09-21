@@ -108,7 +108,7 @@ app.patch("/updateUserEmail", async(req,res) => {
 });
 connectDB().then(() => {
    console.log("DB is Connected successfully !!");
-  app.listen(3000, () => {
+  app.listen(process.env.PORT, () => {
     console.log("Server is successfully listening in port 3000!");
   });
 }).catch( err=>{

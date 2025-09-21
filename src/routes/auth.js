@@ -16,10 +16,13 @@ authRouter.post("/signUp", async(req,res)=> {
 
   //create new user Object
   try{
-   const {firstName, lastName, emailId, password = passwordenc, age,gender} = req.body;
-   const userdata = new user({firstName, lastName, emailId, password: passwordenc, age,gender});
-   await userdata.save();
-   res.send("User data Saved Successfully!!");
+   const {firstName, lastName, emailId, password = passwordenc, age,gender, photoUrl} = req.body;
+   const userdata = new user({firstName, lastName, emailId, password: passwordenc, age,gender,photoUrl});
+   const savedUser = await userdata.save();
+   const token = await savedUser.getJWT();
+    //Assign token to a cookie
+    res.cookie("token",token, {expires: new Date(Date.now() + 1*3600000)});
+   res.json( {message:"User data Saved Successfully!!", data: savedUser});
   } catch(error){
     res.status(400).send("Error occcured on SaveUser !!!" + error);
   }
